@@ -232,7 +232,7 @@ Argument TIME time at which the heartbeat was computed."
            :headers '(("Content-Type" . "application/json"))
            :error (cl-function
                    (lambda (&key data &allow-other-keys)
-                     (message data)))))
+                     (message data) (global-activity-watch-mode 0) (activity-watch-mode 0)))))
 
 (defun activity-watch--call ()
   "Conditionally submit heartbeat to activity watch."
