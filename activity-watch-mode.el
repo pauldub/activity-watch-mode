@@ -144,6 +144,10 @@ use it to find the project's name." docstring)
          (when (require ,feature nil t)
            ,@body)))))
 
+(activity-watch--gen-feature-resolver 'project project
+  (when (project-current)
+    (project-name (project-current))))
+
 (activity-watch--gen-feature-resolver 'projectile projectile
   (when (projectile-project-p)
        (projectile-project-name)))
