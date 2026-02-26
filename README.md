@@ -27,9 +27,36 @@ Enable ActivityWatch for the current buffer by invoking `M-x activity-watch-mode
 
 Set variable `activity-watch-api-host` to your activity watch local instance (default to `http://localhost:5600`).
 
-By default, the extension will try to infer the name of the project by consulting Projectile and Magit. Users can add resolution methods by defining functions in the form `activity-watch-project-name-<NAME>` and then adding `'NAME` to the list of resolvers `activity-watch-project-name-resolvers`. See its documentation for a list of predefined resolvers.
+### Project Name Detection
 
-The default project name used when a proper one cannot be determined is "unknown" and can be customized via `activity-watch-project-name-default`.
+By default, the extension will try to infer the name of the project by consulting Projectile and Magit. Users can add resolution methods by defining functions in the form =activity-watch-project-name-<NAME>= and then adding ='NAME= to the list of resolvers =activity-watch-project-name-resolvers=. See its documentation for a list of predefined resolvers.
+
+The default project name used when a proper one cannot be determined is "unknown" and can be customized via =activity-watch-project-name-default=.
+
+### Org-mode Integration (Optional)
+
+You can automatically link your tracked time to specific Org-mode tasks. When an Org clock is active, the watcher can inject a specific property from the clocked task into the ActivityWatch payload.
+
+To enable this feature, add the following to your configuration:
+
+```elisp
+(setq activity-watch-org-clock-active t)
+(setq activity-watch-org-clock-property "TICKET_ID") ; Replace with your preferred property
+```
+
+Or if you use `use-package`:
+
+```elisp
+(use-package activity-watch-mode
+  :ensure t
+  :custom
+  (activity-watch-org-clock-active t)
+  (activity-watch-org-clock-property "TICKET_ID")
+  :config
+  (global-activity-watch-mode))
+```
+
+This is particularly useful for correlating time spent across different buffers (like =gptel=, =magit=, or source files) with a specific ticket or task ID defined in your Org files.
 
 
 ## Acknowledgments

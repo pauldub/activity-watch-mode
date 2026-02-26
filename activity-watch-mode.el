@@ -8,7 +8,7 @@
 ;; Homepage: https://github.com/pauldub/activity-watch-mode
 ;; Keywords: calendar, comm
 ;; Package-Requires: ((emacs "25") (request "0") (json "0") (cl-lib "0"))
-;; Version: 1.0.2
+;; Version: 1.0.3
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -74,6 +74,19 @@
   "Default name for a non-identifiable project."
   :type 'string
   :group 'activity-watch)
+
+(defcustom activity-watch-org-clock-active nil
+  "When non-nil, inject the active Org clock property into the payload.
+This allows ActivityWatch to track time spent on specific Org tasks."
+  :type 'boolean
+  :group 'activity-watch)
+
+(defcustom activity-watch-org-clock-property "TICKET_ID"
+  "The Org mode property to extract when the clock is active.
+The property name will be converted to lowercase and used as the JSON key."
+  :type 'string
+  :group 'activity-watch)
+
 
 (defcustom activity-watch-project-name-resolvers '(projectile project magit-dir-force magit-origin)
   "List of resolvers used to find the project name.
@@ -169,6 +182,20 @@ use it to find the project's name." docstring)
                                 ".git")))
     proj))
 
+(defun activity-watch--inject-org-property (heartbeat)
+  "Inject the active Org clock property into the ActivityWatch HEARTBEAT payload."
+  (when (and activity-watch-org-clock-active
+             (featurep 'org-clock)
+             (bound-and-true-p org-clock-marker)
+             (marker-buffer org-clock-marker))
+    (let* ((prop-name activity-watch-org-clock-property)
+           (prop-value (org-entry-get org-clock-marker prop-name))
+           (data-cell (assq 'data heartbeat)))
+      (when (and prop-value data-cell)
+        (let ((json-key (intern (downcase prop-name))))
+          (setcdr data-cell (cons (cons json-key prop-value) (cdr data-cell)))))))
+  heartbeat)
+
 (defun activity-watch-project-name-cwd ()
   "Return the name of the `default-directory'."
   (when default-directory
@@ -224,12 +251,13 @@ Argument TIME time at which the heartbeat was computed."
   (let ((project-name (activity-watch--get-project))
         (file-name (buffer-file-name (current-buffer)))
         (git-branch (when (fboundp 'magit-get-current-branch) (magit-get-current-branch))))
+   (activity-watch--inject-org-property
     `((timestamp . ,(ert--format-time-iso8601 time))
       (duration . 0)
       (data . ((language . ,(if (activity-watch--s-blank (symbol-name major-mode)) "unknown" major-mode))
                (project . ,project-name)
                (file . ,(if (activity-watch--s-blank file-name) "unknown" file-name))
-               (branch . ,(or git-branch "unknown")))))))
+               (branch . ,(or git-branch "unknown"))))))))
 
 (cl-defun activity-watch--send-heartbeat (heartbeat &key (on-error nil) (on-success nil))
   "Send HEARTBEAT to activity watch server, calling ON-ERROR on error and ON-SUCCESS on success."
