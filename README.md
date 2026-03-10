@@ -29,9 +29,9 @@ Set variable `activity-watch-api-host` to your activity watch local instance (de
 
 ### Project Name Detection
 
-By default, the extension will try to infer the name of the project by consulting Projectile and Magit. Users can add resolution methods by defining functions in the form =activity-watch-project-name-<NAME>= and then adding ='NAME= to the list of resolvers =activity-watch-project-name-resolvers=. See its documentation for a list of predefined resolvers.
+By default, the extension will try to infer the name of the project by consulting Projectile and Magit. Users can add resolution methods by defining functions in the form `activity-watch-project-name-<NAME>` and then adding `'NAME` to the list of resolvers `activity-watch-project-name-resolvers`. See its documentation for a list of predefined resolvers.
 
-The default project name used when a proper one cannot be determined is "unknown" and can be customized via =activity-watch-project-name-default=.
+The default project name used when a proper one cannot be determined is "unknown" and can be customized via `activity-watch-project-name-default`.
 
 ### Org-mode Integration (Optional)
 
@@ -56,7 +56,7 @@ Or if you use `use-package`:
   (global-activity-watch-mode))
 ```
 
-This is particularly useful for correlating time spent across different buffers (like =gptel=, =magit=, or source files) with a specific ticket or task ID defined in your Org files.
+This is particularly useful for correlating time spent across different buffers (like *gptel*, *magit*, or source files) with a specific ticket or task ID defined in your Org files.
 
 
 ## Acknowledgments
